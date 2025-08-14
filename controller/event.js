@@ -33,3 +33,28 @@ exports.getAllEvents = async (req, res) => {
     });
   }
 }
+
+exports.getEvent = async (req, res) => {
+  try{
+    const event = await Event.findById(req.param.id)
+
+    if (!event) {
+      return res.status(404).json({
+        status: "fail",
+        message: "No event found with that ID",
+      });
+    }
+    res.status(200).json({
+      status: "success",
+      data: {
+        event,
+      },
+    });
+
+  }catch (err){
+    res.status(400).json({
+      status: "fail",
+      error: err,
+  });
+  }
+}
