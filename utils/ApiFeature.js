@@ -46,3 +46,5 @@ class APIFeatures {
     return this;
   }
 }
+
+module.exports = APIFeatures;

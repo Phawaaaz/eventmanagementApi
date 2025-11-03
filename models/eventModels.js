@@ -24,20 +24,33 @@ const eventSchema = new mongoose.Schema(
       type: String,
       required: [true, "Event location is required"],
     },
+    title: {
+      type: String,
+      trim: true,
+    },
     seats: {
       type: Number,
       default: 100,
+      min: [1, 'Event must have at least 1 seat'],
+    },
+    bookedSeats: {
+      type: Number,
+      default: 0,
+      min: [0, 'Booked seats cannot be negative'],
     },
     price: {
       type: Number,
       default: 0,
+      min: [0, 'Price cannot be negative'],
+    },
+    isActive: {
+      type: Boolean,
+      default: true,
+      select: false,
     },
     organizer: {
-      type: String,
-    },
-    createdAt: {
-      type: Date,
-      default: Date.now,
+      type: mongoose.Schema.ObjectId,
+      ref: "user",
     },
   },
   {
@@ -46,6 +59,44 @@ const eventSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+
+// Indexes for better query performance
+eventSchema.index({ category: 1 });
+eventSchema.index({ date: 1 });
+eventSchema.index({ location: 1 });
+eventSchema.index({ isActive: 1 });
+eventSchema.index({ organizer: 1 });
+
+// Virtual populate - Reviews
+eventSchema.virtual('reviews', {
+  ref: 'Review',
+  localField: '_id',
+  foreignField: 'event',
+});
+
+// Virtual populate - Bookings
+eventSchema.virtual('bookings', {
+  ref: 'Booking',
+  localField: '_id',
+  foreignField: 'event',
+});
+
+// Virtual for average rating
+eventSchema.virtual('averageRating').get(function() {
+  // This will be calculated dynamically when needed
+  return null; // Will be populated by aggregation
+});
+
+// Virtual for number of reviews
+eventSchema.virtual('numReviews').get(function() {
+  // This will be calculated dynamically when needed
+  return null; // Will be populated by aggregation
+});
+
+// Virtual for available seats
+eventSchema.virtual('availableSeats').get(function() {
+  return this.seats - this.bookedSeats;
+});
 
 // INSTANCE METHODS
 

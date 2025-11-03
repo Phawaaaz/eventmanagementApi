@@ -18,7 +18,7 @@ const handleValidationErrorDB = (err) => {
 };
 
 const sendErrorDev = (err, res) => {
-  res.status(err.statuscode).json({
+  res.status(err.statusCode || 500).json({
     status: err.status,
     error: err,
     message: err.message,
@@ -42,7 +42,7 @@ const sendErrorProd = (err, res) => {
 };
 
 module.exports = (err, req, res, next) => {
-  err.statuscode = err.statuscode || 500;
+  err.statusCode = err.statusCode || 500;
   err.status = err.status || "error";
 
   if (process.env.NODE_ENV === "development") {

@@ -11,6 +11,7 @@ router.get(
 
 router.get("/event-stats", eventController.eventStat);
 router.get("/monthly-plan/:year", eventController.getMonthlyPlan);
+router.get("/price-analysis", eventController.getPriceAnalysis);
 
 router
   .route("/")
@@ -18,7 +19,7 @@ router
   .get(eventController.getAllEvents);
 
 router
-  .route("/id")
+  .route("/:id")
   .get(eventController.getEvent)
   .patch(eventController.updateEvent)
   .delete(eventController.deleteEvent);

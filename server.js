@@ -1,3 +1,12 @@
+process.on("uncaughtException", (err) => {
+  console.log("UNCAUGHT EXCEPTION! 💥 Shutting down...");
+  console.log("Error name:", err.name);
+  console.log("Error message:", err.message);
+  console.log("Full stack trace:");
+  console.log(err.stack);
+  process.exit(1);
+});
+
 const app = require("./app.js");
 const dotenv = require("dotenv").config({ path: "./.env" });
 const mongoose = require("mongoose");
