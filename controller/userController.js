@@ -1,12 +1,13 @@
-const User = require('../models/userModel');
-const catchAsync = require('../utils/catchAsync');
-const AppError = require('../utils/appError');
+const mongoose = require('mongoose');
+const User = require("../models/userModel");
+const catchAsync = require("../utils/catchAsync");
+const AppError = require("../utils/appError");
 
 exports.getAllUsers = catchAsync(async (req, res, next) => {
   const users = await User.find();
 
   res.status(200).json({
-    status: 'success',
+    status: "success",
     results: users.length,
     data: { users },
   });
@@ -16,11 +17,11 @@ exports.getUser = catchAsync(async (req, res, next) => {
   const user = await User.findById(req.params.id);
 
   if (!user) {
-    return next(new AppError('No user found with that ID', 404));
+    return next(new AppError("No user found with that ID", 404));
   }
 
   res.status(200).json({
-    status: 'success',
+    status: "success",
     data: { user },
   });
 });
@@ -29,7 +30,7 @@ exports.createUser = catchAsync(async (req, res, next) => {
   const newUser = await User.create(req.body);
 
   res.status(201).json({
-    status: 'success',
+    status: "success",
     data: { user: newUser },
   });
 });
@@ -41,24 +42,29 @@ exports.updateUser = catchAsync(async (req, res, next) => {
   });
 
   if (!user) {
-    return next(new AppError('No user found with that ID', 404));
+    return next(new AppError("No user found with that ID", 404));
   }
 
   res.status(200).json({
-    status: 'success',
+    status: "success",
     data: { user },
   });
 });
 
 exports.deleteUser = catchAsync(async (req, res, next) => {
+  // Add validation (LINE 54 - This is where your error occurs!)
+  if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+    return next(new AppError("Invalid user ID format", 400));
+  }
+
   const user = await User.findByIdAndDelete(req.params.id);
 
   if (!user) {
-    return next(new AppError('No user found with that ID', 404));
+    return next(new AppError("No user found with that ID", 404));
   }
 
   res.status(204).json({
-    status: 'success',
+    status: "success",
     data: null,
   });
 });
@@ -68,7 +74,7 @@ exports.updateMe = catchAsync(async (req, res, next) => {
   if (req.body.password || req.body.passwordConfirm) {
     return next(
       new AppError(
-        'This route is not for password updates. Please use /updateMyPassword.',
+        "This route is not for password updates. Please use /updateMyPassword.",
         400
       )
     );
@@ -76,25 +82,21 @@ exports.updateMe = catchAsync(async (req, res, next) => {
 
   // Filtered out unwanted fields names that are not allowed to be updated
   const filteredBody = {};
-  const allowedFields = ['name', 'email', 'photo'];
-  allowedFields.forEach(field => {
+  const allowedFields = ["name", "email", "photo"];
+  allowedFields.forEach((field) => {
     if (req.body[field] !== undefined) {
       filteredBody[field] = req.body[field];
     }
   });
 
   // Update user document
-  const updatedUser = await User.findByIdAndUpdate(
-    req.user.id,
-    filteredBody,
-    {
-      new: true,
-      runValidators: true,
-    }
-  );
+  const updatedUser = await User.findByIdAndUpdate(req.user.id, filteredBody, {
+    new: true,
+    runValidators: true,
+  });
 
   res.status(200).json({
-    status: 'success',
+    status: "success",
     data: {
       user: updatedUser,
     },
@@ -105,7 +107,7 @@ exports.deleteMe = catchAsync(async (req, res, next) => {
   await User.findByIdAndUpdate(req.user.id, { active: false });
 
   res.status(204).json({
-    status: 'success',
+    status: "success",
     data: null,
   });
 });

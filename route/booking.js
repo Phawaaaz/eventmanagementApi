@@ -9,16 +9,15 @@ router.use(authController.protect);
 
 router
   .route("/")
-  .get(bookingController.getAllBookings)
-  .post(bookingController.createBooking);
+  .get(authController.protect, bookingController.getAllBookings)
+  .post(authController.protect, bookingController.createBooking);
 
 router
   .route("/:id")
-  .get(bookingController.getBooking)
+  .get(authController.protect, bookingController.getBooking)
   .patch(bookingController.updateBooking)
   .delete(bookingController.deleteBooking);
 
 router.patch("/:id/cancel", bookingController.cancelBooking);
 
 module.exports = router;
-

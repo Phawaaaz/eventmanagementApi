@@ -7,10 +7,10 @@ process.on("uncaughtException", (err) => {
   process.exit(1);
 });
 
-const app = require("./app.js");
 const dotenv = require("dotenv").config({ path: "./.env" });
+const app = require("./app.js");
 const mongoose = require("mongoose");
-
+// app.use(express.json());
 const db = process.env.DATABASE;
 
 mongoose
